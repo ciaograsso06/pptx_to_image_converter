@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conversor de PPT para Imagens</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-light: #4895ef;
+            --secondary: #3f37c9;
+            --dark: #1a1a2e;
+            --light: #f8f9fa;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --border-radius: 8px;
+            --box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f5f7ff;
+            color: var(--dark);
+            line-height: 1.6;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            color: var(--secondary);
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        
+        .subtitle {
+            color: #666;
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .card {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .upload-container {
+            text-align: center;
+            padding: 2rem;
+            border: 2px dashed #d1d5db;
+            border-radius: var(--border-radius);
+            background: rgba(255, 255, 255, 0.7);
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+        }
+        
+        .upload-container:hover {
+            border-color: var(--primary-light);
+            background: rgba(67, 97, 238, 0.05);
+        }
+        
+        .upload-icon {
+            font-size: 3rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+        
+        .upload-text {
+            margin-bottom: 1.5rem;
+            color: #555;
+        }
+        
+        .btn {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 0.8rem 1.8rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+        
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .file-label {
+            display: inline-block;
+            padding: 0.8rem 1.8rem;
+            background: var(--primary-light);
+            color: white;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-right: 1rem;
+        }
+        
+        .file-label:hover {
+            background: var(--primary);
+        }
+        
+        .file-name {
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .format-select {
+            padding: 0.8rem;
+            border-radius: var(--border-radius);
+            border: 1px solid #d1d5db;
+            font-family: inherit;
+            margin-left: 1rem;
+            background: white;
+            color: var(--dark);
+        }
+        
+        #loading {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: var(--border-radius);
+            margin: 2rem 0;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .images-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .image-card {
+            background: white;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--box-shadow);
+            transition: transform 0.3s ease;
+        }
+        
+        .image-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .image-card img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        
+        .image-info {
+            padding: 1rem;
+            text-align: center;
+            background: white;
+        }
+        
+        .download-btn {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background: var(--success);
+            color: white;
+            border-radius: var(--border-radius);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: background 0.3s ease;
+        }
+        
+        .download-btn:hover {
+            background: #3aa8d8;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding: 1.5rem;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .btn, .file-label {
+                padding: 0.7rem 1.5rem;
+                font-size: 0.9rem;
+            }
+            
+            .images-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Conversor de Apresentações</h1>
+            <p class="subtitle">Transforme seus slides PPTX em imagens de alta qualidade</p>
+        </header>
+        
+        <div class="card">
+            <form id="uploadForm" action="/upload/" method="post" enctype="multipart/form-data">
+                <div class="upload-container">
+                    <div class="upload-icon">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                    </div>
+                    <h3>Arraste e solte seu arquivo PPTX aqui</h3>
+                    <p class="upload-text">ou</p>
+                    
+                    <label for="pptFile" class="file-label">
+                        <i class="fas fa-folder-open"></i> Selecionar Arquivo
+                    </label>
+                    <input type="file" id="pptFile" name="file" accept=".pptx" class="file-input" required>
+                    
+                    <select id="formatSelect" name="format" class="format-select">
+                        <option value="png">PNG</option>
+                        <option value="jpg">JPG</option>
+                        <option value="pdf">PDF</option>
+                    </select>
+                    
+                    <div id="fileName" class="file-name"></div>
+                </div>
+                
+                <div style="text-align: center;">
+                    <button type="submit" class="btn">
+                        <i class="fas fa-exchange-alt"></i> Converter Agora
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        <div id="loading">
+            <div class="spinner"></div>
+            <h3>Convertendo sua apresentação...</h3>
+            <p>Por favor, aguarde enquanto processamos seus slides.</p>
+        </div>
+        
+        <div id="results" style="display: none;">
+            <h2 style="margin-bottom: 1.5rem;">Seus Slides Convertidos</h2>
+            <div id="imagesContainer" class="images-container"></div>
+            
+            <div style="text-align: center; margin-top: 2rem;">
+                <a href="#" id="downloadAll" class="btn">
+                    <i class="fas fa-download"></i> Baixar Todos
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>© 2023 Conversor de PPTX para Imagens | Desenvolvido com <i class="fas fa-heart" style="color: var(--danger);"></i></p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const fileInput = document.getElementById('pptFile');
+            const fileName = document.getElementById('fileName');
+            const uploadForm = document.getElementById('uploadForm');
+            const loading = document.getElementById('loading');
+            const results = document.getElementById('results');
+            const imagesContainer = document.getElementById('imagesContainer');
+            const downloadAll = document.getElementById('downloadAll');
+            
+            // Mostrar nome do arquivo selecionado
+            fileInput.addEventListener('change', function() {
+                if (this.files.length) {
+                    fileName.textContent = `Arquivo selecionado: ${this.files[0].name}`;
+                    fileName.style.color = 'var(--primary)';
+                }
+            });
+            
+            // Drag and drop functionality
+            const uploadContainer = document.querySelector('.upload-container');
+            
+            uploadContainer.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadContainer.style.borderColor = 'var(--primary)';
+                uploadContainer.style.backgroundColor = 'rgba(67, 97, 238, 0.1)';
+            });
+            
+            uploadContainer.addEventListener('dragleave', () => {
+                uploadContainer.style.borderColor = '#d1d5db';
+                uploadContainer.style.backgroundColor = 'rgba(255, 255, 255, 0.7)';
+            });
+            
+            uploadContainer.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadContainer.style.borderColor = '#d1d5db';
+                uploadContainer.style.backgroundColor = 'rgba(255, 255, 255, 0.7)';
+                
+                if (e.dataTransfer.files.length) {
+                    fileInput.files = e.dataTransfer.files;
+                    fileName.textContent = `Arquivo selecionado: ${e.dataTransfer.files[0].name}`;
+                    fileName.style.color = 'var(--primary)';
+                }
+            });
+            
+            // Form submission
+            uploadForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const file = fileInput.files[0];
+                const format = document.getElementById('formatSelect').value;
+                
+                if (!file) {
+                    showAlert('Por favor, selecione um arquivo PPTX', 'error');
+                    return;
+                }
+                
+                if (!file.name.endsWith('.pptx')) {
+                    showAlert('Por favor, selecione um arquivo PPTX válido', 'error');
+                    return;
+                }
+                
+                loading.style.display = 'block';
+                results.style.display = 'none';
+                imagesContainer.innerHTML = '';
+                
+                try {
+                    const formData = new FormData();
+                    formData.append('file', file);
+                    formData.append('format', format);
+                    
+                    const response = await fetch('/upload/', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error('Erro ao converter arquivo');
+                    }
+                    
+                    const data = await response.json();
+                    
+                    // Display images
+                    if (data.images && data.images.length) {
+                        imagesContainer.innerHTML = '';
+                        data.images.forEach((imagePath, index) => {
+                            const imageCard = document.createElement('div');
+                            imageCard.className = 'image-card';
+                            imageCard.innerHTML = `
+                                <img src="${imagePath}" alt="Slide ${index + 1}">
+                                <div class="image-info">
+                                    <p>Slide ${index + 1}</p>
+                                    <a href="${imagePath}" download="slide_${index + 1}.${format}" class="download-btn">
+                                        <i class="fas fa-download"></i> Baixar
+                                    </a>
+                                </div>
+                            `;
+                            imagesContainer.appendChild(imageCard);
+                        });
+                        
+                        // Set up download all button
+                        downloadAll.href = data.zip_url || '#';
+                        downloadAll.download = `slides.${format === 'pdf' ? 'pdf' : 'zip'}`;
+                        
+                        results.style.display = 'block';
+                        showAlert('Conversão concluída com sucesso!', 'success');
+                    } else {
+                        throw new Error('Nenhuma imagem foi gerada');
+                    }
+                } catch (error) {
+                    showAlert('Erro ao processar arquivo: ' + error.message, 'error');
+                } finally {
+                    loading.style.display = 'none';
+                    window.scrollTo({
+                        top: document.body.scrollHeight,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+            
+            function showAlert(message, type) {
+                // Remove any existing alerts
+                const existingAlert = document.querySelector('.alert');
+                if (existingAlert) {
+                    existingAlert.remove();
+                }
+                
+                const alert = document.createElement('div');
+                alert.className = `alert alert-${type}`;
+                alert.textContent = message;
+                alert.style.position = 'fixed';
+                alert.style.top = '20px';
+                alert.style.right = '20px';
+                alert.style.padding = '15px 20px';
+                alert.style.borderRadius = 'var(--border-radius)';
+                alert.style.color = 'white';
+                alert.style.backgroundColor = type === 'error' ? 'var(--danger)' : 'var(--success)';
+                alert.style.boxShadow = 'var(--box-shadow)';
+                alert.style.zIndex = '1000';
+                alert.style.animation = 'fadeIn 0.3s ease';
+                
+                document.body.appendChild(alert);
+                
+                setTimeout(() => {
+                    alert.style.animation = 'fadeOut 0.3s ease';
+                    setTimeout(() => {
+                        alert.remove();
+                    }, 300);
+                }, 3000);
+            }
+            
+            // Add CSS for alert animations
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes fadeIn {
+                    from { opacity: 0; transform: translateY(-20px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+                @keyframes fadeOut {
+                    from { opacity: 1; transform: translateY(0); }
+                    to { opacity: 0; transform: translateY(-20px); }
+                }
+            `;
+            document.head.appendChild(style);
+        });
+    </script>
+</body>
+</html>
